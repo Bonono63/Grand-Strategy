@@ -1,0 +1,50 @@
+[gd_scene load_steps=7 format=3 uid="uid://bxh7ktym7eeqw"]
+
+[ext_resource type="Script" path="res://tile.gd" id="1_amcpt"]
+[ext_resource type="Script" path="res://tile_area.gd" id="2_i2oh5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bnj11"]
+size = Vector3(1, 0.125, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_j8lqg"]
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r7blp"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_q5bco"]
+resource_local_to_scene = true
+material = SubResource("StandardMaterial3D_r7blp")
+size = Vector2(1, 1)
+
+[node name="tile" type="Node3D"]
+script = ExtResource("1_amcpt")
+
+[node name="Area3D" type="Area3D" parent="."]
+script = ExtResource("2_i2oh5")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.062, 0)
+shape = SubResource("BoxShape3D_bnj11")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.1, -0.5)
+visible = false
+mesh = SubResource("BoxMesh_j8lqg")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, -0.5)
+visible = false
+mesh = SubResource("BoxMesh_j8lqg")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, 0.5)
+visible = false
+mesh = SubResource("BoxMesh_j8lqg")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.1, 0.5)
+visible = false
+mesh = SubResource("BoxMesh_j8lqg")
+
+[node name="Main" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_q5bco")

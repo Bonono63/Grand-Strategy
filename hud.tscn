@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://bq3k33qt1jtae"]
+
+[ext_resource type="Script" path="res://HUD.gd" id="1_6vrm0"]
+
+[node name="Panel" type="Panel"]
+offset_right = 168.0
+offset_bottom = 102.0
+script = ExtResource("1_6vrm0")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 157.0
+offset_bottom = 26.0

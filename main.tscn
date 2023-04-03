@@ -1,0 +1,76 @@
+[gd_scene load_steps=13 format=3 uid="uid://dlxw7dv0nohys"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_7xmko"]
+[ext_resource type="PackedScene" uid="uid://dq28uk77qcpju" path="res://camera.tscn" id="1_l1bi4"]
+[ext_resource type="PackedScene" uid="uid://bq3k33qt1jtae" path="res://hud.tscn" id="3_mekru"]
+[ext_resource type="PackedScene" uid="uid://cvc7amwiciagx" path="res://tile_hud.tscn" id="4_b0w1s"]
+[ext_resource type="Script" path="res://Tiles.gd" id="5_sf8iy"]
+[ext_resource type="Script" path="res://Tile_Collision.gd" id="6_rauk1"]
+
+[sub_resource type="Environment" id="Environment_sjxrb"]
+background_mode = 1
+background_color = Color(0.2, 0.2, 0.2, 1)
+tonemap_mode = 2
+ssao_intensity = 6.0
+glow_bloom = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2168n"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_rrp2d"]
+material = SubResource("StandardMaterial3D_2168n")
+size = Vector2(1, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_qxiuo"]
+transform_format = 1
+use_colors = true
+mesh = SubResource("PlaneMesh_rrp2d")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lf0ik"]
+size = Vector3(1, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_5e6o8"]
+size = Vector2(1, 1)
+
+[node name="Main" type="Node3D" node_paths=PackedStringArray("Camera")]
+script = ExtResource("1_7xmko")
+Camera = NodePath("Camera")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sjxrb")
+
+[node name="Camera" parent="." instance=ExtResource("1_l1bi4")]
+transform = Transform3D(1, 0, 0, 0, -2.98023e-08, 1, 0, -1, -2.98023e-08, 0, 2, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.835472, -0.47591, 0.274767, 0, 0.5, 0.866025, -0.549533, -0.72354, 0.417736, 9.99268, 11, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Debug HUD" parent="CanvasLayer" node_paths=PackedStringArray("camera") instance=ExtResource("3_mekru")]
+camera = NodePath("../../Camera")
+
+[node name="Tile HUD" parent="CanvasLayer" node_paths=PackedStringArray("Tile_collision_area", "Main") instance=ExtResource("4_b0w1s")]
+Tile_collision_area = NodePath("../../Tile_Collision")
+Main = NodePath("../..")
+
+[node name="Tiles" type="Node3D" parent="." node_paths=PackedStringArray("Main")]
+visible = false
+script = ExtResource("5_sf8iy")
+Main = NodePath("..")
+
+[node name="Units" type="Node3D" parent="."]
+
+[node name="Tile_render" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_qxiuo")
+
+[node name="Tile_Collision" type="Area3D" parent="."]
+script = ExtResource("6_rauk1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tile_Collision"]
+shape = SubResource("BoxShape3D_lf0ik")
+
+[node name="Collision Box Outline (Debug)" type="MeshInstance3D" parent="Tile_Collision"]
+visible = false
+mesh = SubResource("PlaneMesh_5e6o8")
