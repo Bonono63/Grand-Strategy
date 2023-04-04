@@ -4,15 +4,18 @@
 [ext_resource type="PackedScene" uid="uid://dq28uk77qcpju" path="res://camera.tscn" id="1_l1bi4"]
 [ext_resource type="PackedScene" uid="uid://bq3k33qt1jtae" path="res://hud.tscn" id="3_mekru"]
 [ext_resource type="PackedScene" uid="uid://cvc7amwiciagx" path="res://tile_hud.tscn" id="4_b0w1s"]
-[ext_resource type="Script" path="res://Tiles.gd" id="5_sf8iy"]
+[ext_resource type="Script" path="res://Units.gd" id="5_c4d8o"]
 [ext_resource type="Script" path="res://Tile_Collision.gd" id="6_rauk1"]
 
 [sub_resource type="Environment" id="Environment_sjxrb"]
 background_mode = 1
-background_color = Color(0.2, 0.2, 0.2, 1)
-tonemap_mode = 2
-ssao_intensity = 6.0
-glow_bloom = 0.5
+background_color = Color(0.207843, 0.207843, 0.207843, 1)
+ssao_enabled = true
+sdfgi_enabled = true
+glow_enabled = true
+glow_bloom = 0.03
+fog_sun_scatter = 0.34
+volumetric_fog_density = 0.0738
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2168n"]
 vertex_color_use_as_albedo = true
@@ -51,16 +54,13 @@ transform = Transform3D(0.835472, -0.47591, 0.274767, 0, 0.5, 0.866025, -0.54953
 [node name="Debug HUD" parent="CanvasLayer" node_paths=PackedStringArray("camera") instance=ExtResource("3_mekru")]
 camera = NodePath("../../Camera")
 
-[node name="Tile HUD" parent="CanvasLayer" node_paths=PackedStringArray("Tile_collision_area", "Main") instance=ExtResource("4_b0w1s")]
+[node name="Tile HUD" parent="CanvasLayer" node_paths=PackedStringArray("Tile_collision_area", "Unit_collision_area", "Main") instance=ExtResource("4_b0w1s")]
 Tile_collision_area = NodePath("../../Tile_Collision")
+Unit_collision_area = NodePath("../../Units")
 Main = NodePath("../..")
 
-[node name="Tiles" type="Node3D" parent="." node_paths=PackedStringArray("Main")]
-visible = false
-script = ExtResource("5_sf8iy")
-Main = NodePath("..")
-
 [node name="Units" type="Node3D" parent="."]
+script = ExtResource("5_c4d8o")
 
 [node name="Tile_render" type="MultiMeshInstance3D" parent="."]
 multimesh = SubResource("MultiMesh_qxiuo")

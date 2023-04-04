@@ -41,14 +41,14 @@ func _unhandled_input(event):
 				rotation_control = true
 			if event.is_action_released("right_click"):
 				rotation_control = false
-		if event is InputEventKey:
-			if event.is_action_pressed("free_cam"):
-				if free_cam:
-					free_cam = false
-					print("free_cam ",free_cam)
-				else:
-					print("free_cam ",free_cam)
-					free_cam = true
+	if event is InputEventKey:
+		if event.is_action_pressed("free_cam"):
+			if free_cam == true:
+				free_cam = false
+				print("free_cam ",free_cam)
+			else:
+				print("free_cam ",free_cam)
+				free_cam = true
 
 var _rotation_y : float
 var prev_zoom = 0.5

@@ -8,5 +8,6 @@ offset_bottom = 102.0
 script = ExtResource("1_6vrm0")
 
 [node name="Label" type="Label" parent="."]
+layout_mode = 0
 offset_right = 157.0
 offset_bottom = 26.0
