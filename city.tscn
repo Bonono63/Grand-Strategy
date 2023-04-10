@@ -1,6 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://ciyf7j87m3jvm"]
+[gd_scene load_steps=6 format=3 uid="uid://dkjfsje71ww6d"]
 
-[ext_resource type="Script" path="res://city.gd" id="1_trrsn"]
+[ext_resource type="Script" path="res://city_instance.gd" id="1_fa8cb"]
 [ext_resource type="Script" path="res://shape.gd" id="2_26i2m"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ebet1"]
@@ -18,7 +18,7 @@ size = Vector3(0.25, 0.25, 0.25)
 [node name="MeshInstance3D" type="MeshInstance3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0)
 mesh = SubResource("BoxMesh_k7ft8")
-script = ExtResource("1_trrsn")
+script = ExtResource("1_fa8cb")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_layer = 8

@@ -8,8 +8,8 @@ const max_chunk_size = 500
 var map = []
 #format: [x][y]: unit type (0-5)
 var units = []
-#format: [x][y]: [population, food]
-var cities = [[]]
+#format: [x][y]: name, population, food (city class)
+var cities = []
 
 var hour = 0
 var month = 0
@@ -58,52 +58,60 @@ var settler_unit_instance := preload("res://unit.tscn").instantiate()
 var soldier_unit_instance := preload("res://unit.tscn").instantiate()
 var city_instance := preload("res://city.tscn").instantiate()
 
-func add_unit(a : int, global_coordinates : Vector2i):
+#global coordinates to local position
+func gc_to_lp(global_coordinates : Vector2i) -> Vector2i:
+	return Vector2i(int(global_coordinates.x-(max_chunk_size/2)),int(global_coordinates.y-(max_chunk_size/2)))
+
+func add_unit(a : int, global_coordinates : Vector2i) -> void:
+	var lc = gc_to_lp(global_coordinates)
 	if a == unit_type.settler:
 		var instance := settler_unit_instance.duplicate()
-		instance.position.x = int(global_coordinates.x-(max_chunk_size/2))
-		instance.position.z = int(global_coordinates.y-(max_chunk_size/2))
+		instance.position.x = lc.x
+		instance.position.z = lc.y
 		units[global_coordinates.x][global_coordinates.y] = a
 		$Units.add_child(instance)
 	else: if a == unit_type.soldier:
 		var instance := soldier_unit_instance.duplicate()
-		instance.position.x = int(global_coordinates.x-(max_chunk_size/2))
-		instance.position.z = int(global_coordinates.y-(max_chunk_size/2))
-		units[int(global_coordinates.x-(max_chunk_size/2))][int(global_coordinates.y-(max_chunk_size/2))] = a
+		instance.position.x = lc.x
+		instance.position.z = lc.y
+		units[global_coordinates.x][global_coordinates.y] = a
 		$Units.add_child(instance)
 
-
-func add_city(global_coordinates : Vector2i):
+func add_city(global_coordinates : Vector2i) -> void:
 	var instance := city_instance.duplicate()
-	var x = int(global_coordinates.x-(max_chunk_size/2))
-	var z = int(global_coordinates.y-(max_chunk_size/2))
-	instance.position.x = x
-	instance.position.z = z
-	cities[x][z][0] = 0
-	cities[x][z][1] = 0
+	var lc = gc_to_lp(global_coordinates)
+	instance.position.x = lc.x
+	instance.position.z = lc.y
+	instance.init("Berlin")
+	var _city = city.new()
+	_city.init("Berlin")
+	cities[global_coordinates.x][global_coordinates.y] = _city
 	$Cities.add_child(instance)
 
-func initialize_2d_array(array, length_size, width_size):
+func initialize_2d_array(array, length_size, width_size) -> void:
 	for x in range(length_size):
 		var y = []
 		y.resize(width_size)
 		array.append(y)
 
-func initialize_3d_array(array, length_size, width_size, depth_size):
+func initialize_3d_array(array, length_size, width_size, depth_size) -> void:
 	for x in range(length_size):
 		var y = []
-		y.resize(width_size)
 		for j in range(width_size):
 			var z = []
 			z.resize(depth_size)
 			y.append(z)
 		array.append(y)
 
+func set_camera_global_coordinates(global_coordinates : Vector2i) -> void:
+	$Camera.position.x = int(global_coordinates.x-(max_chunk_size/2))
+	$Camera.position.z = int(global_coordinates.y-(max_chunk_size/2))
+
 func _init():
 	initialize_2d_array(map, size, size)
 	initialize_2d_array(units, size, size)
-	initialize_3d_array(cities, 2, 2, 2)
-	print(cities)
+	initialize_2d_array(cities, size, size)
+	#print(cities)
 	for x in range(size):
 		for y in range(size):
 			map[x][y] = randi_range(0,tile_type.size()-1)
@@ -141,8 +149,8 @@ func _ready():
 					tile_type.RIVER:
 						$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
 				a+=1
-	#print($Tile_render.multimesh.instance_count)
-	#print(a)
+	
+	set_camera_global_coordinates(Vector2i(250,250))
 	
 	add_unit(unit_type.settler, Vector2i(250,250))
 	add_unit(unit_type.settler, Vector2i(250,251))
@@ -154,7 +162,14 @@ func _unhandled_input(event):
 		if event.is_action_pressed("quit"):
 			get_tree().quit()
 
+func pop_sim(cities) -> void:
+	for x in range(cities.size()):
+		pass
+	pass
+
 func _process(_delta):
+	
+	
 	
 	if time_stop:
 		hour+=1
@@ -163,51 +178,51 @@ func _process(_delta):
 		day+=1
 	match(month):
 		0:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		1:
-			if day == 28:
+			if day > 28:
 				month +=1
 				day = 1
 		2:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		3:
-			if day == 30:
+			if day > 30:
 				month +=1
 				day = 1
 		4:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		5:
-			if day == 30:
+			if day > 30:
 				month +=1
 				day = 1
 		6:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		7:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		8:
-			if day == 30:
+			if day > 30:
 				month +=1
 				day = 1
 		9:
-			if day == 31:
+			if day > 31:
 				month +=1
 				day = 1
 		10:
-			if day == 30:
+			if day > 30:
 				month +=1
 				day = 1
 		11:
-			if day == 31:
+			if day > 31:
 				year += 1
 				month = 0
 				day = 1
@@ -218,15 +233,5 @@ func _process(_delta):
 		
 		$Tile_Collision.position.x = CameraPosI.x
 		$Tile_Collision.position.z = CameraPosI.y
-		
-		#for node in $Tiles.get_children():
-		#	node.queue_free()
-		
-		#for x in range(max_chunk_size):
-		#	for z in range(max_chunk_size):
-		#		var temp = tile.duplicate()
-		#		temp.init(map[x+CameraPosI.x][z+CameraPosI.y], Vector2i(x+CameraPosI.x,z+CameraPosI.y))
-		#		temp.position.x = x+CameraPosI.x-(max_chunk_size/2)
-		#		temp.position.z = z+CameraPosI.y-(max_chunk_size/2)
-		#		$Tiles.add_child(temp)
+	
 	prevCameraPosI = CameraPosI

@@ -1,10 +1,11 @@
-extends MeshInstance3D
+class_name city
+extends Node
 
-signal interaction
+var _name : String 
+var population : int
+var food : int
 
-func _ready():
-	$Area3D.connect("interaction", _input_event)
-
-# camera, event, _position, normal, shape_idx
-func _input_event(a, b, c, d, e):
-	emit_signal("interaction", a, b, c, d, e)
+func init(_name):
+	_name = _name
+	population = 1000
+	food = 1000

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://c7migijls3fhr"]
+[gd_scene load_steps=17 format=3 uid="uid://c7migijls3fhr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_7xmko"]
 [ext_resource type="PackedScene" uid="uid://dq28uk77qcpju" path="res://camera.tscn" id="1_l1bi4"]
@@ -10,7 +10,6 @@
 [ext_resource type="Script" path="res://Tile_Collision.gd" id="6_rauk1"]
 [ext_resource type="PackedScene" uid="uid://bp5qvyklx1klx" path="res://info_hud.tscn" id="7_cq4jb"]
 [ext_resource type="Script" path="res://Cities.gd" id="9_1k5ie"]
-[ext_resource type="PackedScene" uid="uid://ciyf7j87m3jvm" path="res://city.tscn" id="10_5eqws"]
 
 [sub_resource type="Environment" id="Environment_sjxrb"]
 background_mode = 1
@@ -88,9 +87,6 @@ script = ExtResource("5_c4d8o")
 
 [node name="Cities" type="Node3D" parent="."]
 script = ExtResource("9_1k5ie")
-
-[node name="MeshInstance3D" parent="Cities" instance=ExtResource("10_5eqws")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000723958, 0.905751, 0.00250781)
 
 [node name="Tile_render" type="MultiMeshInstance3D" parent="."]
 multimesh = SubResource("MultiMesh_qxiuo")
