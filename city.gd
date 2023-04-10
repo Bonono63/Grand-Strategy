@@ -1,14 +1,10 @@
-extends Node3D
+extends MeshInstance3D
 
-var population = 0
-var food = 0
-var production = 0
-
-func _init(_tile):
-	pass
+signal interaction
 
 func _ready():
-	$MeshInstance3D/Amongus.connect("selected", on_select)
+	$Area3D.connect("interaction", _input_event)
 
-func on_select():
-	print("selected")
+# camera, event, _position, normal, shape_idx
+func _input_event(a, b, c, d, e):
+	emit_signal("interaction", a, b, c, d, e)

@@ -3,9 +3,20 @@ extends Node3D
 @export var Camera : Node3D
 
 const size = 1000
-const max_chunk_size = 100
+const max_chunk_size = 500
+#format: [x][y]: tile typw (0-8)
 var map = []
+#format: [x][y]: unit type (0-5)
 var units = []
+#format: [x][y]: [population, food]
+var cities = [[]]
+
+var hour = 0
+var month = 0
+var day = 0
+var year = 0
+
+var time_stop
 
 var CameraPosI : Vector2i
 var prevCameraPosI : Vector2i
@@ -13,7 +24,10 @@ var prevCameraPosI : Vector2i
 enum unit_type
 {
 	settler,
-	soldier
+	soldier,
+	mage,
+	dragon,
+	tank
 }
 
 enum tile_type
@@ -42,36 +56,60 @@ const PALE_YELLOW = Color("fff8a6")
 
 var settler_unit_instance := preload("res://unit.tscn").instantiate()
 var soldier_unit_instance := preload("res://unit.tscn").instantiate()
+var city_instance := preload("res://city.tscn").instantiate()
 
 func add_unit(a : int, global_coordinates : Vector2i):
 	if a == unit_type.settler:
 		var instance := settler_unit_instance.duplicate()
-		instance.position.x = global_coordinates.x
-		instance.position.z = global_coordinates.y
+		instance.position.x = int(global_coordinates.x-(max_chunk_size/2))
+		instance.position.z = int(global_coordinates.y-(max_chunk_size/2))
 		units[global_coordinates.x][global_coordinates.y] = a
 		$Units.add_child(instance)
 	else: if a == unit_type.soldier:
 		var instance := soldier_unit_instance.duplicate()
-		instance.position.x = global_coordinates.x
-		instance.position.z = global_coordinates.y
-		units[global_coordinates.x][global_coordinates.y] = a
+		instance.position.x = int(global_coordinates.x-(max_chunk_size/2))
+		instance.position.z = int(global_coordinates.y-(max_chunk_size/2))
+		units[int(global_coordinates.x-(max_chunk_size/2))][int(global_coordinates.y-(max_chunk_size/2))] = a
 		$Units.add_child(instance)
 
-func _init():
-	for x in range(size):
+
+func add_city(global_coordinates : Vector2i):
+	var instance := city_instance.duplicate()
+	var x = int(global_coordinates.x-(max_chunk_size/2))
+	var z = int(global_coordinates.y-(max_chunk_size/2))
+	instance.position.x = x
+	instance.position.z = z
+	cities[x][z][0] = 0
+	cities[x][z][1] = 0
+	$Cities.add_child(instance)
+
+func initialize_2d_array(array, length_size, width_size):
+	for x in range(length_size):
 		var y = []
-		y.resize(size)
-		map.append(y)
+		y.resize(width_size)
+		array.append(y)
+
+func initialize_3d_array(array, length_size, width_size, depth_size):
+	for x in range(length_size):
+		var y = []
+		y.resize(width_size)
+		for j in range(width_size):
+			var z = []
+			z.resize(depth_size)
+			y.append(z)
+		array.append(y)
+
+func _init():
+	initialize_2d_array(map, size, size)
+	initialize_2d_array(units, size, size)
+	initialize_3d_array(cities, 2, 2, 2)
+	print(cities)
 	for x in range(size):
 		for y in range(size):
 			map[x][y] = randi_range(0,tile_type.size()-1)
-	for x in range(size):
-		var y = []
-		y.resize(size)
-		units.append(y)
 
 func _ready():
-	print(tile_type.find_key(map[500][500]))
+	#print(tile_type.find_key(map[500][500]))
 	$Tile_Collision/CollisionShape3D.shape.size.x = max_chunk_size
 	$Tile_Collision/CollisionShape3D.shape.size.z = max_chunk_size
 	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.x = max_chunk_size
@@ -103,10 +141,13 @@ func _ready():
 					tile_type.RIVER:
 						$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
 				a+=1
-	print($Tile_render.multimesh.instance_count)
-	print(a)
+	#print($Tile_render.multimesh.instance_count)
+	#print(a)
 	
-	add_unit(unit_type.settler, Vector2i(0,0))
+	add_unit(unit_type.settler, Vector2i(250,250))
+	add_unit(unit_type.settler, Vector2i(250,251))
+	add_city(Vector2i(250,250))
+	add_city(Vector2i(252,250))
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -114,6 +155,63 @@ func _unhandled_input(event):
 			get_tree().quit()
 
 func _process(_delta):
+	
+	if time_stop:
+		hour+=1
+	if hour == 24:
+		hour = 0
+		day+=1
+	match(month):
+		0:
+			if day == 31:
+				month +=1
+				day = 1
+		1:
+			if day == 28:
+				month +=1
+				day = 1
+		2:
+			if day == 31:
+				month +=1
+				day = 1
+		3:
+			if day == 30:
+				month +=1
+				day = 1
+		4:
+			if day == 31:
+				month +=1
+				day = 1
+		5:
+			if day == 30:
+				month +=1
+				day = 1
+		6:
+			if day == 31:
+				month +=1
+				day = 1
+		7:
+			if day == 31:
+				month +=1
+				day = 1
+		8:
+			if day == 30:
+				month +=1
+				day = 1
+		9:
+			if day == 31:
+				month +=1
+				day = 1
+		10:
+			if day == 30:
+				month +=1
+				day = 1
+		11:
+			if day == 31:
+				year += 1
+				month = 0
+				day = 1
+	
 	CameraPosI = Vector2i(int(Camera.position.x),int(Camera.position.z))
 	
 	if CameraPosI != null && prevCameraPosI != CameraPosI:
