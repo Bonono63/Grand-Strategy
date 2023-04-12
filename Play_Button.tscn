@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7rt36k7twuc2"]
+
+[ext_resource type="Script" path="res://Play_Button.gd" id="1_6b1u3"]
+
+[node name="Play" type="CheckBox"]
+process_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -44.0
+offset_bottom = 24.0
+grow_horizontal = 0
+focus_mode = 0
+script = ExtResource("1_6b1u3")

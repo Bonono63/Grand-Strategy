@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://derkspfym824b"]
+
+[ext_resource type="Texture2D" uid="uid://de4b41koxig8j" path="res://imperial.png" id="1_8yb8p"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 40.0
+offset_right = 40.0
+offset_bottom = 80.0
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 1000.0
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 56.0
+offset_bottom = 26.0
+text = "Imperial Germany
+"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+texture_filter = 1
+layout_mode = 0
+offset_top = 25.0
+offset_right = 302.0
+offset_bottom = 225.0
+texture = ExtResource("1_8yb8p")
+expand_mode = 3
+stretch_mode = 4

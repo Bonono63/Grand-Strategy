@@ -1,6 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://dq28uk77qcpju"]
+[gd_scene load_steps=5 format=3 uid="uid://dq28uk77qcpju"]
 
 [ext_resource type="Script" path="res://Camera3D.gd" id="1_f5w4m"]
+[ext_resource type="Shader" path="res://toon_outline.gdshader" id="2_vjan0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_to0b4"]
+render_priority = 0
+shader = ExtResource("2_vjan0")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/distance_falloff = 1.0
+shader_parameter/smoothing_cutoff = 0.1
+shader_parameter/smoothing_max = 0.1
+
+[sub_resource type="QuadMesh" id="QuadMesh_ugbf0"]
+material = SubResource("ShaderMaterial_to0b4")
+flip_faces = true
+size = Vector2(2, 2)
 
 [node name="Node3D" type="Node3D"]
 process_mode = 3
@@ -8,3 +22,10 @@ script = ExtResource("1_f5w4m")
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera"]
+transform = Transform3D(1, 0, 0, 0, 1, 1.06581e-14, 0, -1.06581e-14, 1, 0, 0, -0.8)
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_ugbf0")
+skeleton = NodePath("../../..")

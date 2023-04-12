@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://d2eyeymv6aqne"]
+
+[ext_resource type="Script" path="res://Main_HUD.gd" id="1_nf4ot"]
+[ext_resource type="PackedScene" uid="uid://c4xievputj6ii" path="res://menus/demography_menu.tscn" id="2_ecoah"]
+[ext_resource type="PackedScene" uid="uid://cf8k7xciop6xr" path="res://menus/economy_menu.tscn" id="3_4vxvs"]
+[ext_resource type="PackedScene" uid="uid://derkspfym824b" path="res://menus/politics_menu.tscn" id="4_jd0co"]
+
+[node name="TabContainer" type="TabContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+clip_tabs = false
+script = ExtResource("1_nf4ot")
+
+[node name="Politics" parent="." instance=ExtResource("4_jd0co")]
+layout_mode = 2
+
+[node name="Economy" parent="." instance=ExtResource("3_4vxvs")]
+visible = false
+layout_mode = 2
+
+[node name="Demography" parent="." instance=ExtResource("2_ecoah")]
+visible = false
+layout_mode = 2
