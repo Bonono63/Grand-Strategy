@@ -14,7 +14,7 @@ func _ready():
 func _tile_input_event(_a, b, c, _d, _e):
 	var x = int(c.x+(Main.max_chunk_size/2)+0.5)
 	var z = int(c.z+(Main.max_chunk_size/2)+0.5)
-	$Label.text = str("Coordinates: (",x,",",z,")\n", "Tile Type: ",Main.tile_type.find_key(Main.map[x][z]))
+	$Label.text = str("Coordinates: (",x,",",z,")\n", "Tile Type: ",Main.tile_type.find_key(Main.map[x][z].type))
 
 #camera, event, position, normal, shape_idx
 func _unit_input_event(_a, b, c, _d, _e):

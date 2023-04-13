@@ -42,6 +42,33 @@ enum tile_type
 	RIVER
 }
 
+enum resource_types
+{
+	wood,
+	stone,
+	copper,
+	tin,
+	gold,
+	silver,
+	iron,
+	coal,
+	steel,
+	chromium,
+	gunpowder,
+	horses,
+	food,
+	concrete,
+	chocoa,
+	tobacco,
+	cotton,
+	textiles,
+	indigo,
+	wheat,
+	potatoes,
+	carrots,
+	meat
+}
+
 const DARK_BLUE = Color("020552")
 const RED = Color("ff0000")
 const GREEN = Color("1b6b02")
@@ -131,7 +158,7 @@ func _ready():
 	for x in range(max_chunk_size):
 			for z in range(max_chunk_size):
 				var state = map[x][z].type
-				print(tile_type.find_key(state))
+				#print(tile_type.find_key(state))
 				$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int(x-(max_chunk_size/2)), 0, int(z-(max_chunk_size/2)))))
 				#$Tile_render.multimesh.set_instance_color(2, Color("#42f2f5"))
 				match (state):
@@ -155,7 +182,7 @@ func _ready():
 	
 	set_camera_global_coordinates(Vector2i(250,250))
 	
-	add_unit(unit_type.settler, Vector2i(250,250))
+	add_unit(unit_type.settler, Vector2i(251,251))
 	add_unit(unit_type.settler, Vector2i(250,251))
 	add_city(Vector2i(250,250))
 	add_city(Vector2i(252,250))

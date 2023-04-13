@@ -3,18 +3,18 @@
 [ext_resource type="Script" path="res://unit.gd" id="1_ijpqf"]
 [ext_resource type="Script" path="res://unit_area.gd" id="2_d5bn6"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nwipg"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_afme8"]
 
-[sub_resource type="TextMesh" id="TextMesh_j1xfn"]
-material = SubResource("StandardMaterial3D_nwipg")
-text = "cock"
+[sub_resource type="BoxMesh" id="BoxMesh_b66j8"]
+material = SubResource("StandardMaterial3D_afme8")
+size = Vector3(0.125, 0.125, 0.125)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gp3ud"]
 size = Vector3(0.125, 0.125, 0.125)
 
 [node name="MeshInstance3D" type="MeshInstance3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.063, 0)
-mesh = SubResource("TextMesh_j1xfn")
+mesh = SubResource("BoxMesh_b66j8")
 script = ExtResource("1_ijpqf")
 
 [node name="Area3D" type="Area3D" parent="."]

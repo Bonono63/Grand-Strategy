@@ -26,9 +26,9 @@ var shift = 1
 func _unhandled_input(event):
 	if event.is_action_pressed("reset_camera"):
 		rotation.y = 0
-		zoom = 0.5
+		zoom = min_zoom
 		position.y = 0
-		$Camera.rotation.x = PI
+		$Camera.rotation.x = PI/2
 	if event.is_action_pressed("zoom_in"):
 		if zoom > min_zoom : zoom-=zoom_increment
 	if event.is_action_pressed("zoom_out"):
@@ -87,7 +87,7 @@ func _process(_delta):
 	if position_control:
 		translate_object_local(Vector3(x*mouse_sensitivity,y*mouse_sensitivity,0))
 	
-	if rotation_control:
+	if rotation_control && shift > 1:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_rotation_y = (x*mouse_sensitivity)
 		rotate_y(_rotation_y)
