@@ -3,10 +3,10 @@
 [ext_resource type="Script" path="res://unit.gd" id="1_ijpqf"]
 [ext_resource type="Script" path="res://unit_area.gd" id="2_d5bn6"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v683f"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nwipg"]
 
 [sub_resource type="TextMesh" id="TextMesh_j1xfn"]
-material = SubResource("StandardMaterial3D_v683f")
+material = SubResource("StandardMaterial3D_nwipg")
 text = "cock"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gp3ud"]

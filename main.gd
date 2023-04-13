@@ -114,7 +114,9 @@ func _init():
 	#print(cities)
 	for x in range(size):
 		for y in range(size):
-			map[x][y] = randi_range(0,tile_type.size()-1)
+			var _tile = tile.new()
+			_tile.init(randi_range(0,tile_type.size()-1), [1000,1000,10,0])
+			map[x][y] = _tile
 
 func _ready():
 	#print(tile_type.find_key(map[500][500]))
@@ -128,7 +130,8 @@ func _ready():
 	var a = 0
 	for x in range(max_chunk_size):
 			for z in range(max_chunk_size):
-				var state = map[x][z]
+				var state = map[x][z].type
+				print(tile_type.find_key(state))
 				$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int(x-(max_chunk_size/2)), 0, int(z-(max_chunk_size/2)))))
 				#$Tile_render.multimesh.set_instance_color(2, Color("#42f2f5"))
 				match (state):
