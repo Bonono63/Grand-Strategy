@@ -13,5 +13,5 @@ func _process(_delta):
 				child.connect("interaction", _input_event)
 		prev_children = children
 
-func _input_event(a, b, c, d, e):
-	emit_signal("interaction", a, b, c, d, e)
+func _input_event(a, b, c, d, e, selected):
+	emit_signal("interaction", a, b, c, d, e, selected)

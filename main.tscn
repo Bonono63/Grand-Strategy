@@ -19,7 +19,6 @@ sdfgi_enabled = true
 glow_enabled = true
 glow_bloom = 0.03
 fog_sun_scatter = 0.34
-volumetric_fog_density = 0.0738
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2168n"]
 vertex_color_use_as_albedo = true
@@ -40,15 +39,16 @@ size = Vector3(1, 0, 1)
 [sub_resource type="PlaneMesh" id="PlaneMesh_5e6o8"]
 size = Vector2(1, 1)
 
-[node name="Main" type="Node3D" node_paths=PackedStringArray("Camera")]
+[node name="World" type="Node3D" node_paths=PackedStringArray("Camera")]
 script = ExtResource("1_7xmko")
 Camera = NodePath("Camera")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_sjxrb")
 
-[node name="Camera" parent="." instance=ExtResource("1_l1bi4")]
+[node name="Camera" parent="." node_paths=PackedStringArray("main") instance=ExtResource("1_l1bi4")]
 transform = Transform3D(1, 0, 0, 0, -0.642788, 0.766044, 0, -0.766044, -0.642788, 0, 2, 0)
+main = NodePath("..")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.835472, -0.47591, 0.274767, 0, 0.5, 0.866025, -0.549533, -0.72354, 0.417736, 9.99268, 11, 0)
@@ -56,20 +56,21 @@ transform = Transform3D(0.835472, -0.47591, 0.274767, 0, 0.5, 0.866025, -0.54953
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 process_mode = 3
 
-[node name="Debug HUD" parent="CanvasLayer" node_paths=PackedStringArray("camera") instance=ExtResource("3_mekru")]
+[node name="Debug HUD" parent="CanvasLayer" node_paths=PackedStringArray("main", "camera") instance=ExtResource("3_mekru")]
 anchors_preset = 6
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_top = -51.0
 offset_bottom = 51.0
 grow_vertical = 2
+main = NodePath("../..")
 camera = NodePath("../../Camera")
 
-[node name="Tile HUD" parent="CanvasLayer" node_paths=PackedStringArray("Tile_collision_area", "Unit_collision_area", "City_collision_area", "Main") instance=ExtResource("4_b0w1s")]
+[node name="Tile HUD" parent="CanvasLayer" node_paths=PackedStringArray("Tile_collision_area", "Unit_collision_area", "City_collision_area", "main") instance=ExtResource("4_b0w1s")]
 Tile_collision_area = NodePath("../../Tile_Collision")
 Unit_collision_area = NodePath("../../Units")
 City_collision_area = NodePath("../../Cities")
-Main = NodePath("../..")
+main = NodePath("../..")
 
 [node name="Main_HUD" parent="CanvasLayer" instance=ExtResource("5_knsnw")]
 

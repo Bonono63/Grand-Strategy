@@ -6,6 +6,7 @@ const min_zoom = 1.5
 
 @export var zoom_speed = 0.09
 @export var mouse_sensitivity = 0.005
+@export var main : Node3D
 
 var zoom = min_zoom
 
@@ -27,7 +28,7 @@ func _unhandled_input(event):
 	if event.is_action_pressed("reset_camera"):
 		rotation.y = 0
 		zoom = min_zoom
-		position.y = 0
+		main.set_camera_global_coordinates(Vector2i(0,0))
 		$Camera.rotation.x = PI/2
 	if event.is_action_pressed("zoom_in"):
 		if zoom > min_zoom : zoom-=zoom_increment

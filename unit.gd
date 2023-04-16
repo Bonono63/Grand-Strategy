@@ -1,30 +1,32 @@
-extends MeshInstance3D
+class_name unit
+extends Node
 
-signal interaction
+var selected : bool = false
 
-var selected = false
+var health : int = 100
+var supply : int = 0
+var type : int
 
-func _ready():
-	$Area3D.connect("interaction", _input_event)
+func select(_selected):
+	selected = _selected
 
-# camera, event, _position, normal, shape_idx
-func _input_event(a, b, c, d, e):
-	if b is InputEventMouseButton:
-		if b.is_action_pressed("left_click"):
-			select()
-	emit_signal("interaction", a, b, c, d, e)
+func get_selected() -> bool:
+	return selected
 
-func select():
-	if selected:
-		print("unselected")
-		selected = false
-		set_color("#FFFFFF")
-	else:
-		print("selected")
-		selected = true
-		set_color("#fcba03")
+func get_health() -> int:
+	return health
 
-func set_color(color : String):
-	var mat = get_active_material(0).duplicate()
-	mat.set("albedo_color", color)
-	set_surface_override_material(0, mat)
+func set_health(_health : int) -> void:
+	health = _health
+
+func get_supply() -> int:
+	return supply
+
+func set_supply(_supply : int) -> void:
+	supply = _supply
+
+func get_type() -> int:
+	return type
+
+func set_type(_type : int) -> void:
+	type = _type
