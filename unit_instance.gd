@@ -1,4 +1,4 @@
-extends MeshInstance3D
+extends Node3D
 
 signal interaction
 
@@ -6,8 +6,8 @@ var selected = false
 
 func _ready():
 	$Area3D.connect("interaction", _input_event)
-	if (selected):
-		set_color("#fcba03")
+	#if (selected):
+	#	set_color("#fcba03")
 
 func init(gc : Vector2i, _selected : bool):
 	name = str(gc)
@@ -25,13 +25,13 @@ func select():
 	if selected:
 		print("unselected")
 		selected = false
-		set_color("#FFFFFF")
+	#	set_color("#FFFFFF")
 	else:
 		print("selected")
 		selected = true
-		set_color("#fcba03")
+	#	set_color("#fcba03")
 
-func set_color(color : String):
-	var mat = get_active_material(0).duplicate()
-	mat.set("albedo_color", color)
-	set_surface_override_material(0, mat)
+#func set_color(color : String):
+#	var mat = get_active_material(0).duplicate()
+#	mat.set("albedo_color", color)
+#	set_surface_override_material(0, mat)

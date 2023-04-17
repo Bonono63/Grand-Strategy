@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c7migijls3fhr"]
+[gd_scene load_steps=22 format=3 uid="uid://c7migijls3fhr"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_7xmko"]
 [ext_resource type="PackedScene" uid="uid://dq28uk77qcpju" path="res://camera.tscn" id="1_l1bi4"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://Tile_Collision.gd" id="6_rauk1"]
 [ext_resource type="PackedScene" uid="uid://bp5qvyklx1klx" path="res://info_hud.tscn" id="7_cq4jb"]
 [ext_resource type="Script" path="res://Cities.gd" id="9_1k5ie"]
+[ext_resource type="Script" path="res://Settler_Collision.gd" id="11_174la"]
 
 [sub_resource type="Environment" id="Environment_sjxrb"]
 background_mode = 1
@@ -33,11 +34,27 @@ transform_format = 1
 use_colors = true
 mesh = SubResource("PlaneMesh_rrp2d")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hwckp"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_ud40l"]
+material = SubResource("StandardMaterial3D_hwckp")
+size = Vector3(0.125, 0.125, 0.125)
+
+[sub_resource type="MultiMesh" id="MultiMesh_wm6bo"]
+transform_format = 1
+use_colors = true
+mesh = SubResource("BoxMesh_ud40l")
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_lf0ik"]
 size = Vector3(1, 0, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_5e6o8"]
 size = Vector2(1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8fmi0"]
+size = Vector3(1, 0, 1)
 
 [node name="World" type="Node3D" node_paths=PackedStringArray("Camera")]
 script = ExtResource("1_7xmko")
@@ -92,6 +109,9 @@ script = ExtResource("9_1k5ie")
 [node name="Tile_render" type="MultiMeshInstance3D" parent="."]
 multimesh = SubResource("MultiMesh_qxiuo")
 
+[node name="Settler_renderer" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_wm6bo")
+
 [node name="Tile_Collision" type="Area3D" parent="."]
 script = ExtResource("6_rauk1")
 
@@ -101,3 +121,13 @@ shape = SubResource("BoxShape3D_lf0ik")
 [node name="Collision Box Outline (Debug)" type="MeshInstance3D" parent="Tile_Collision"]
 visible = false
 mesh = SubResource("PlaneMesh_5e6o8")
+
+[node name="Settler_Collision" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
+visible = false
+collision_layer = 16
+collision_mask = 16
+script = ExtResource("11_174la")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Settler_Collision"]
+shape = SubResource("BoxShape3D_8fmi0")

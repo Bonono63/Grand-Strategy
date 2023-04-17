@@ -3,18 +3,17 @@
 [ext_resource type="Script" path="res://unit_instance.gd" id="1_efh2w"]
 [ext_resource type="Script" path="res://unit_area.gd" id="2_d5bn6"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2mge3"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_pyxqq"]
-material = SubResource("StandardMaterial3D_2mge3")
-size = Vector2(0.125, 0.125)
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_gp3ud"]
 size = Vector3(0.125, 0.125, 0.125)
 
-[node name="MeshInstance3D" type="MeshInstance3D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ydgjd"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_s3mh4"]
+material = SubResource("StandardMaterial3D_ydgjd")
+size = Vector3(0.125, 0.125, 0.125)
+
+[node name="MeshInstance3D" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.063, 0)
-mesh = SubResource("PlaneMesh_pyxqq")
 script = ExtResource("1_efh2w")
 
 [node name="Area3D" type="Area3D" parent="."]
@@ -25,3 +24,7 @@ script = ExtResource("2_d5bn6")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("BoxShape3D_gp3ud")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("BoxMesh_s3mh4")

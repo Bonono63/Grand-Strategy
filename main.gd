@@ -254,6 +254,8 @@ func _ready():
 	#print(tile_type.find_key(map[500][500]))
 	$Tile_Collision/CollisionShape3D.shape.size.x = max_chunk_size
 	$Tile_Collision/CollisionShape3D.shape.size.z = max_chunk_size
+	$Settler_Collision/CollisionShape3D.shape.size.x = max_chunk_size
+	$Settler_Collision/CollisionShape3D.shape.size.z = max_chunk_size
 	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.x = max_chunk_size
 	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.y = max_chunk_size
 	
@@ -295,6 +297,7 @@ func _ready():
 					var temp = settler_unit_instance.duplicate()
 					var gc : Vector2i = units[x].global_coordinate
 					var lp : Vector2i = gc_to_lp(units[x].global_coordinate)
+					$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(int(lp.x-(max_chunk_size/2)), 0, int(lp.y-(max_chunk_size/2)))))
 					var selected = get_unit_selected(gc)
 					temp.position.x = lp.x
 					temp.position.z = lp.y
@@ -405,10 +408,13 @@ func _process(_delta):
 		$Tile_Collision.position.x = CameraPosI.x
 		$Tile_Collision.position.z = CameraPosI.y
 		
+		$Settler_renderer.position.x = CameraPosI.x
+		$Settler_renderer.position.z = CameraPosI.y
+		
 		var a = 0
 		for x in range(max_chunk_size):
 				for z in range(max_chunk_size):
-					var state = map[int((x+CameraPosI.x)-(max_chunk_size/2))][int((z+CameraPosI.y)-(max_chunk_size/2))][map_layer.TILE_TYPE].type
+					var state = map[int((x+CameraPosI.x)-(max_chunk_size/2)-1)][int((z+CameraPosI.y)-(max_chunk_size/2)-1)][map_layer.TILE_TYPE].type
 					$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int((x+CameraPosI.x)-(max_chunk_size/2)), 0, int((z+CameraPosI.y)-(max_chunk_size/2)))))
 					match (state):
 						tile_type.PLAINS:
@@ -440,16 +446,22 @@ func _process(_delta):
 				if (units[x] != null):
 					match(units[x].type):
 						unit_type.settler:
-							var temp = settler_unit_instance.duplicate()
+							#var temp = settler_unit_instance.duplicate()
 							var gc : Vector2i = units[x].global_coordinate
-							var lp : Vector2i = gc_to_lp(units[x].global_coordinate)
-							var selected = get_unit_selected(gc)
-							temp.position.x = lp.x#-int(max_chunk_size/2)
-							temp.position.z = lp.y#-int(max_chunk_size/2)
-							temp.init(gc, selected)
-							$Units.add_child(temp)
-	
-	
+							var lp : Vector2i = Vector2i(int(units[x].global_coordinate.x-(max_chunk_size/2)),int(units[x].global_coordinate.y-(max_chunk_size/2)))
+							$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
+							if (get_unit_selected(gc)):
+								$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
+							else:
+								$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
+							$Settler_renderer.multimesh.instance_count = units.size()
+							#var selected = get_unit_selected(gc)
+							#temp.position.x = lp.x
+							#temp.position.z = lp.y
+							#temp.init(gc, selected)
+							#$Units.add_child(temp)
 	
 	prevCameraPosI = CameraPosI
 	prev_units = units
+	#print(units)
+	#units = []
