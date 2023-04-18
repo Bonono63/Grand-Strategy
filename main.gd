@@ -4,7 +4,7 @@ extends Node3D
 @export var Camera : Node3D
 
 const size = 1000
-const max_chunk_size = 100
+const max_chunk_size = 200
 
 #format: [x][y][map layer] : content
 var map = []
@@ -186,9 +186,8 @@ func get_units_in_box(camera_gc : Vector2i) -> Array:
 	var _units = []
 	for i in range(max_chunk_size):
 		for j in range(max_chunk_size):
-			var unit_gc := Vector2i((i+camera_gc.x)-(max_chunk_size/2), j+camera_gc.y-(max_chunk_size/2))
+			var unit_gc := Vector2i((i+camera_gc.x)-(max_chunk_size/2), (j+camera_gc.y)-(max_chunk_size/2))
 			if map[unit_gc.x][unit_gc.y][map_layer.UNIT_TYPE] != null:
-				#print(unit_gc)
 				var temp = unit_array_type.new()
 				temp.global_coordinate = unit_gc
 				temp.type = get_unit_type(unit_gc)
@@ -297,7 +296,7 @@ func _ready():
 					var temp = settler_unit_instance.duplicate()
 					var gc : Vector2i = units[x].global_coordinate
 					var lp : Vector2i = gc_to_lp(units[x].global_coordinate)
-					$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(int(lp.x-(max_chunk_size/2)), 0, int(lp.y-(max_chunk_size/2)))))
+					$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(int(lp.x-(max_chunk_size/2)), 0.0625, int(lp.y-(max_chunk_size/2)))))
 					var selected = get_unit_selected(gc)
 					temp.position.x = lp.x
 					temp.position.z = lp.y
@@ -437,29 +436,24 @@ func _process(_delta):
 	
 	var Camera_gc = lp_to_gc($Camera.position)
 	units = get_units_in_box(Camera_gc)
-	if units != prev_units:
-		if (units != null):
-			for child in $Units.get_children():
-				child.queue_free()
-			
-			for x in range(units.size()):
-				if (units[x] != null):
-					match(units[x].type):
-						unit_type.settler:
-							#var temp = settler_unit_instance.duplicate()
-							var gc : Vector2i = units[x].global_coordinate
-							var lp : Vector2i = Vector2i(int(units[x].global_coordinate.x-(max_chunk_size/2)),int(units[x].global_coordinate.y-(max_chunk_size/2)))
-							$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
-							if (get_unit_selected(gc)):
-								$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
-							else:
-								$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
-							$Settler_renderer.multimesh.instance_count = units.size()
-							#var selected = get_unit_selected(gc)
-							#temp.position.x = lp.x
-							#temp.position.z = lp.y
-							#temp.init(gc, selected)
-							#$Units.add_child(temp)
+	#if units != prev_units:
+	if (units != null):
+		for child in $Units.get_children():
+			child.queue_free()
+		
+		for x in range(units.size()):
+			if (units[x] != null):
+				match(units[x].type):
+					unit_type.settler:
+						$Settler_renderer.multimesh.instance_count = units.size()
+						var gc : Vector2i = units[x].global_coordinate
+						var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-Camera_gc.x)),int((units[x].global_coordinate.y-Camera_gc.y)))
+						$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
+						if (get_unit_selected(gc)):
+							$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
+						else:
+							$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
+						
 	
 	prevCameraPosI = CameraPosI
 	prev_units = units
