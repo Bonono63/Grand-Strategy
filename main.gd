@@ -434,7 +434,6 @@ func _process(_delta):
 				$Settler_renderer.multimesh.instance_count = units.size()
 				var gc : Vector2i = units[x].global_coordinate
 				var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-CameraPosI.x)-(chunk_size/2)),int((units[x].global_coordinate.y-CameraPosI.y)-(chunk_size/2)))
-				
 				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
 				if (get_unit_selected(gc)):
 					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
