@@ -4,7 +4,7 @@ extends Node3D
 @export var Camera : Node3D
 
 const size = 1000
-const max_chunk_size = 200
+const chunk_size = 100
 
 #format: [x][y][map layer] : content
 var map = []
@@ -182,11 +182,11 @@ func get_selected_units(units : Array) -> Array:
 	
 	return selected
 
-func get_units_in_box(camera_gc : Vector2i) -> Array:
+func get_units_in_box(camera_gc : Vector3) -> Array:
 	var _units = []
-	for i in range(max_chunk_size):
-		for j in range(max_chunk_size):
-			var unit_gc := Vector2i((i+camera_gc.x)-(max_chunk_size/2), (j+camera_gc.y)-(max_chunk_size/2))
+	for i in range(chunk_size):
+		for j in range(chunk_size):
+			var unit_gc := Vector2i((i+camera_gc.x)-(chunk_size/2), (j+camera_gc.z)-(chunk_size/2))
 			if map[unit_gc.x][unit_gc.y][map_layer.UNIT_TYPE] != null:
 				var temp = unit_array_type.new()
 				temp.global_coordinate = unit_gc
@@ -197,7 +197,7 @@ func get_units_in_box(camera_gc : Vector2i) -> Array:
 
 #************************ redo once the unit area is created (more performant)
 
-func get_movement_action(a, b, c, d, e):
+func get_movement_action(_a, b, c, _d, _e):
 	if b is InputEventMouseButton:
 		if b.is_action_pressed("right_click"):
 			var pos = lp_to_gc(c)
@@ -211,10 +211,10 @@ func get_movement_action(a, b, c, d, e):
 
 #global coordinates to local position
 func gc_to_lp(global_coordinates : Vector2i) -> Vector2i:
-	return Vector2i(int(global_coordinates.x-(max_chunk_size/2)),int(global_coordinates.y-(max_chunk_size/2)))
+	return Vector2i(int(global_coordinates.x-(chunk_size/2)),int(global_coordinates.y-(chunk_size/2)))
 
 func lp_to_gc(_position : Vector3) -> Vector2i:
-	return Vector2i(int(_position.x+(max_chunk_size/2)+0.5), int(_position.z+(max_chunk_size/2)+0.5))
+	return Vector2i(int(_position.x+(chunk_size/2)+0.5), int(_position.z+(chunk_size/2)+0.5))
 
 func initialize_2d_array(array, length_size, width_size) -> void:
 	for x in range(length_size):
@@ -232,8 +232,8 @@ func initialize_3d_array(array, length_size, width_size, depth_size) -> void:
 		array.append(y)
 
 func set_camera_global_coordinates(global_coordinates : Vector2i) -> void:
-	$Camera.position.x = int(global_coordinates.x)#-(max_chunk_size/2))
-	$Camera.position.z = int(global_coordinates.y)#-(max_chunk_size/2))
+	$Camera.position.x = int(global_coordinates.x-(chunk_size/2))
+	$Camera.position.z = int(global_coordinates.y-(chunk_size/2))
 
 ########################################################
 # Node Functions
@@ -251,24 +251,24 @@ func _init():
 func _ready():
 	Engine.max_fps = 60
 	#print(tile_type.find_key(map[500][500]))
-	$Tile_Collision/CollisionShape3D.shape.size.x = max_chunk_size
-	$Tile_Collision/CollisionShape3D.shape.size.z = max_chunk_size
-	$Settler_Collision/CollisionShape3D.shape.size.x = max_chunk_size
-	$Settler_Collision/CollisionShape3D.shape.size.z = max_chunk_size
-	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.x = max_chunk_size
-	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.y = max_chunk_size
+	$Tile_Collision/CollisionShape3D.shape.size.x = chunk_size
+	$Tile_Collision/CollisionShape3D.shape.size.z = chunk_size
+	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.x = chunk_size
+	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.y = chunk_size
+	$Settler_Collision/CollisionShape3D.shape.size.x = chunk_size
+	$Settler_Collision/CollisionShape3D.shape.size.z = chunk_size
 	
-	$Tile_render.multimesh.instance_count = max_chunk_size*max_chunk_size
+	$Tile_render.multimesh.instance_count = chunk_size*chunk_size
 	
 	$Units.connect("interaction", unit_interaction)
 	$Tile_Collision.connect("interaction", get_movement_action)
 	
 	var a = 0
-	for x in range(max_chunk_size):
-			for z in range(max_chunk_size):
+	for x in range(chunk_size):
+			for z in range(chunk_size):
 				var state = map[x][z][map_layer.TILE_TYPE].type
 				#print(tile_type.find_key(state))
-				$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int(x-(max_chunk_size/2)), 0, int(z-(max_chunk_size/2)))))
+				$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int(x-(chunk_size/2)), 0, int(z-(chunk_size/2)))))
 				#$Tile_render.multimesh.set_instance_color(2, Color("#42f2f5"))
 				match (state):
 					tile_type.PLAINS:
@@ -289,44 +289,26 @@ func _ready():
 						$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
 				a+=1
 	
+	units = get_units_in_box($Camera.position)
 	for x in range(units.size()):
-		if (units[x] != null):
-			match(units[x].type):
-				unit_type.settler:
-					var temp = settler_unit_instance.duplicate()
-					var gc : Vector2i = units[x].global_coordinate
-					var lp : Vector2i = gc_to_lp(units[x].global_coordinate)
-					$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(int(lp.x-(max_chunk_size/2)), 0.0625, int(lp.y-(max_chunk_size/2)))))
-					var selected = get_unit_selected(gc)
-					temp.position.x = lp.x
-					temp.position.z = lp.y
-					temp.init(gc, selected)
-					$Units.add_child(temp)
+		match(units[x].type):
+			unit_type.settler:
+				$Settler_renderer.multimesh.instance_count = units.size()
+				var gc : Vector2i = units[x].global_coordinate
+				var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-CameraPosI.x)-(chunk_size/2)),int((units[x].global_coordinate.y-CameraPosI.y)-(chunk_size/2)))
+				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
+				if (get_unit_selected(gc)):
+					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
+				else:
+					$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
 	
 	set_camera_global_coordinates(Vector2i(0,0))
 	
-	for x in 10:
-		for y in 10:
-			add_unit(unit_type.settler, Vector2i(x,y))
+	add_unit(unit_type.settler, Vector2i(0,0))
 	
-	for x in 10:
-		for y in 10:
-			add_unit(unit_type.settler, Vector2i(-x,-y))
 	
-	for x in 10:
-		for y in 10:
-			add_unit(unit_type.settler, Vector2i(-x,y))
-	
-	for x in 10:
-		for y in 10:
-			add_unit(unit_type.settler, Vector2i(x,-y))
-	#add_unit(unit_type.settler, Vector2i(1,2))
-	#add_unit(unit_type.settler, Vector2i(1,3))
-	#add_unit(unit_type.settler, Vector2i(1,4))
-	#add_unit(unit_type.settler, Vector2i(1,5))
-	#add_unit(unit_type.settler, Vector2i(250,251))
-	#add_city(Vector2i(0,0))
-	#add_city(Vector2i(252,250))
+	add_unit(unit_type.settler, Vector2i(11,0))
+	#add_city(Vector2i(4,0))
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -399,22 +381,32 @@ func _process(_delta):
 				month = 0
 				day = 1
 	
-	# general camera and functionalty code
+	# render tiles and units
 	CameraPosI = Vector2i(int(Camera.position.x),int(Camera.position.z))
+	
+	var chunk_offset : Vector2i
+	if ((Camera.position.x <= (chunk_size/2))):
+		chunk_offset.x = (chunk_size/2) - Camera.position.x
+	if ((Camera.position.z <= (chunk_size/2))):
+		chunk_offset.y = (chunk_size/2) - Camera.position.z
+		
+	var chunk_position : Vector2i
+	chunk_position.x = CameraPosI.x+chunk_offset.x
+	chunk_position.y = CameraPosI.y+chunk_offset.y
 	
 	if CameraPosI != null && prevCameraPosI != CameraPosI:
 		
-		$Tile_Collision.position.x = CameraPosI.x
-		$Tile_Collision.position.z = CameraPosI.y
+		$Tile_Collision.position.x = chunk_position.x-0.5
+		$Tile_Collision.position.z = chunk_position.y-0.5
 		
-		$Settler_renderer.position.x = CameraPosI.x
-		$Settler_renderer.position.z = CameraPosI.y
+		$Settler_renderer.position.x = chunk_position.x-0.5
+		$Settler_renderer.position.z = chunk_position.y-0.5
 		
 		var a = 0
-		for x in range(max_chunk_size):
-				for z in range(max_chunk_size):
-					var state = map[int((x+CameraPosI.x)-(max_chunk_size/2)-1)][int((z+CameraPosI.y)-(max_chunk_size/2)-1)][map_layer.TILE_TYPE].type
-					$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int((x+CameraPosI.x)-(max_chunk_size/2)), 0, int((z+CameraPosI.y)-(max_chunk_size/2)))))
+		for i in range(chunk_size):
+				for j in range(chunk_size):
+					var state = map[i+chunk_position.x-(chunk_size/2)][j+chunk_position.y-(chunk_size/2)][map_layer.TILE_TYPE].type
+					$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(i+chunk_position.x-(chunk_size/2), 0, j+chunk_position.y-(chunk_size/2))))
 					match (state):
 						tile_type.PLAINS:
 							$Tile_render.multimesh.set_instance_color(a, PALE_GREEN)
@@ -434,28 +426,20 @@ func _process(_delta):
 							$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
 					a+=1
 	
-	var Camera_gc = lp_to_gc($Camera.position)
-	units = get_units_in_box(Camera_gc)
-	#if units != prev_units:
-	if (units != null):
-		for child in $Units.get_children():
-			child.queue_free()
-		
-		for x in range(units.size()):
-			if (units[x] != null):
-				match(units[x].type):
-					unit_type.settler:
-						$Settler_renderer.multimesh.instance_count = units.size()
-						var gc : Vector2i = units[x].global_coordinate
-						var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-Camera_gc.x)),int((units[x].global_coordinate.y-Camera_gc.y)))
-						$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
-						if (get_unit_selected(gc)):
-							$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
-						else:
-							$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
-						
+	
+	units = get_units_in_box($Camera.position)
+	for x in range(units.size()):
+		match(units[x].type):
+			unit_type.settler:
+				$Settler_renderer.multimesh.instance_count = units.size()
+				var gc : Vector2i = units[x].global_coordinate
+				var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-CameraPosI.x)-(chunk_size/2)),int((units[x].global_coordinate.y-CameraPosI.y)-(chunk_size/2)))
+				
+				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
+				if (get_unit_selected(gc)):
+					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
+				else:
+					$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
 	
 	prevCameraPosI = CameraPosI
 	prev_units = units
-	#print(units)
-	#units = []

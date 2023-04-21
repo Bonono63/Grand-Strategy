@@ -5,7 +5,7 @@ const max_zoom = 9.5
 const min_zoom = 1.5
 
 @export var zoom_speed = 0.09
-@export var mouse_sensitivity = 0.005
+@export var mouse_sensitivity = 0.01
 @export var main : Node3D
 
 var zoom = min_zoom
@@ -111,6 +111,9 @@ func _process(_delta):
 	#		$Camera.rotate_object_local(Vector3(1,0,0), PI/36)
 	#	else:
 	#		$Camera.rotate_object_local(Vector3(-1,0,0), PI/36)
+	
+	position.x = clamp(position.x, 0,main.size)
+	position.z = clamp(position.z, 0,main.size)
 	
 	x = 0
 	y = 0

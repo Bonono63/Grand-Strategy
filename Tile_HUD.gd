@@ -32,7 +32,7 @@ func _process(_delta):
 		visible = true
 
 func tile_convert_interact_position(_position : Vector3) -> Vector2i:
-	return Vector2i(int(_position.x+(main.max_chunk_size/2)+0.5), int(_position.z+(main.max_chunk_size/2)+0.5))
+	return Vector2i(int(_position.x+0.5), int(_position.z+0.5))
 
 func unit_convert_interact_position(_position : Vector3) -> Vector2i:
-	return Vector2i(int(_position.x+(main.max_chunk_size/2)+0.5), int(_position.z+(main.max_chunk_size/2)+0.5))
+	return Vector2i(int(_position.x+(main.chunk_size/2)), int(_position.z+(main.chunk_size/2)))

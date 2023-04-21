@@ -15,9 +15,6 @@
 [sub_resource type="Environment" id="Environment_sjxrb"]
 background_mode = 1
 background_color = Color(0.207843, 0.207843, 0.207843, 1)
-ssao_enabled = true
-sdfgi_enabled = true
-glow_enabled = true
 glow_bloom = 0.03
 fog_sun_scatter = 0.34
 
@@ -119,6 +116,7 @@ script = ExtResource("6_rauk1")
 shape = SubResource("BoxShape3D_lf0ik")
 
 [node name="Collision Box Outline (Debug)" type="MeshInstance3D" parent="Tile_Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0)
 visible = false
 mesh = SubResource("PlaneMesh_5e6o8")
 
