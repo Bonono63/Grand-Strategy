@@ -26,6 +26,9 @@ var time_stop
 var CameraPosI : Vector2i
 var prevCameraPosI : Vector2i
 
+var chunk_offset : Vector2i
+var chunk_position : Vector2i
+
 enum map_layer
 {
 	TILE_TYPE,
@@ -133,7 +136,6 @@ func add_city(global_coordinates : Vector2i) -> void:
 # Unit functions
 #
 func add_unit(a : int, global_coordinates : Vector2i) -> void:
-	var lc = gc_to_lp(global_coordinates)
 	var _unit = unit.new()
 	if a == unit_type.settler:
 		set_unit(global_coordinates, _unit)
@@ -182,18 +184,17 @@ func get_selected_units(units : Array) -> Array:
 	
 	return selected
 
-func get_units_in_box(camera_gc : Vector3) -> Array:
+func get_units_in_box(chunk_position : Vector2i) -> Array:
 	var _units = []
 	for i in range(chunk_size):
 		for j in range(chunk_size):
-			var unit_gc := Vector2i((i+camera_gc.x)-(chunk_size/2), (j+camera_gc.z)-(chunk_size/2))
+			var unit_gc := Vector2i((i+chunk_position.x)-(chunk_size/2), (j+chunk_position.y)-(chunk_size/2))
 			if map[unit_gc.x][unit_gc.y][map_layer.UNIT_TYPE] != null:
 				var temp = unit_array_type.new()
 				temp.global_coordinate = unit_gc
 				temp.type = get_unit_type(unit_gc)
 				_units.append(temp)
 	return _units
-
 
 #************************ redo once the unit area is created (more performant)
 
@@ -232,15 +233,14 @@ func initialize_3d_array(array, length_size, width_size, depth_size) -> void:
 		array.append(y)
 
 func set_camera_global_coordinates(global_coordinates : Vector2i) -> void:
-	$Camera.position.x = int(global_coordinates.x-(chunk_size/2))
-	$Camera.position.z = int(global_coordinates.y-(chunk_size/2))
+	$Camera.position.x = int(global_coordinates.x)
+	$Camera.position.z = int(global_coordinates.y)
 
 ########################################################
 # Node Functions
 #
 
 func _init():
-	#initialize_2d_array(unit_chunk, max_chunk_size, max_chunk_size)
 	initialize_3d_array(map, size, size, map_layer.size())
 	for x in range(size):
 		for y in range(size):
@@ -250,7 +250,6 @@ func _init():
 
 func _ready():
 	Engine.max_fps = 60
-	#print(tile_type.find_key(map[500][500]))
 	$Tile_Collision/CollisionShape3D.shape.size.x = chunk_size
 	$Tile_Collision/CollisionShape3D.shape.size.z = chunk_size
 	$"Tile_Collision/Collision Box Outline (Debug)".mesh.size.x = chunk_size
@@ -263,52 +262,15 @@ func _ready():
 	$Units.connect("interaction", unit_interaction)
 	$Tile_Collision.connect("interaction", get_movement_action)
 	
-	var a = 0
-	for x in range(chunk_size):
-			for z in range(chunk_size):
-				var state = map[x][z][map_layer.TILE_TYPE].type
-				#print(tile_type.find_key(state))
-				$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(int(x-(chunk_size/2)), 0, int(z-(chunk_size/2)))))
-				#$Tile_render.multimesh.set_instance_color(2, Color("#42f2f5"))
-				match (state):
-					tile_type.PLAINS:
-						$Tile_render.multimesh.set_instance_color(a, PALE_GREEN)
-					tile_type.FOREST:
-						$Tile_render.multimesh.set_instance_color(a, GREEN)
-					tile_type.MOUNTAINS:
-						$Tile_render.multimesh.set_instance_color(a, GREY)
-					tile_type.DEEP_OCEAN:
-						$Tile_render.multimesh.set_instance_color(a, DARK_BLUE)
-					tile_type.DESERT:
-						$Tile_render.multimesh.set_instance_color(a, PALE_YELLOW)
-					tile_type.OCEAN:
-						$Tile_render.multimesh.set_instance_color(a, BLUE)
-					tile_type.TUNDRA:
-						$Tile_render.multimesh.set_instance_color(a, LIGHT_GREY)
-					tile_type.RIVER:
-						$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
-				a+=1
+	_game_tick()
 	
-	units = get_units_in_box($Camera.position)
-	for x in range(units.size()):
-		match(units[x].type):
-			unit_type.settler:
-				$Settler_renderer.multimesh.instance_count = units.size()
-				var gc : Vector2i = units[x].global_coordinate
-				var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-CameraPosI.x)-(chunk_size/2)),int((units[x].global_coordinate.y-CameraPosI.y)-(chunk_size/2)))
-				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
-				if (get_unit_selected(gc)):
-					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
-				else:
-					$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
+	set_camera_global_coordinates(Vector2i(950,950))
 	
-	set_camera_global_coordinates(Vector2i(0,0))
-	
-	add_unit(unit_type.settler, Vector2i(0,0))
-	
-	
-	add_unit(unit_type.settler, Vector2i(11,0))
-	#add_city(Vector2i(4,0))
+	add_unit(unit_type.settler, Vector2i(6,6))
+	add_unit(unit_type.settler, Vector2i(5,6))
+	add_unit(unit_type.settler, Vector2i(4,7))
+	add_unit(unit_type.settler, Vector2i(60,60))
+	add_unit(unit_type.settler, Vector2i(950,950))
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -322,9 +284,79 @@ func population_simulation(cities) -> void:
 	pass
 
 func _process(_delta):
+	_game_tick()
+
+func _game_tick() -> void:
 	
-	# Time counter
+	timer()
 	
+	# render tiles and units
+	CameraPosI = Vector2i(int(Camera.position.x),int(Camera.position.z))
+	
+	if ((Camera.position.x < (chunk_size/2))):
+		chunk_offset.x = (chunk_size/2) - Camera.position.x
+	else: if ((Camera.position.x >= size-(chunk_size/2))):
+		chunk_offset.x = (size - Camera.position.x) - (chunk_size/2)
+	if ((Camera.position.z < (chunk_size/2))):
+		chunk_offset.y = (chunk_size/2) - Camera.position.z
+	else: if ((Camera.position.z >= size-(chunk_size/2))):
+		chunk_offset.y = (size - Camera.position.z) - (chunk_size/2)
+	
+	chunk_position.x = CameraPosI.x+chunk_offset.x
+	chunk_position.y = CameraPosI.y+chunk_offset.y
+	
+	if CameraPosI != null && prevCameraPosI != CameraPosI:
+		
+		$Tile_Collision.position.x = chunk_position.x-0.5
+		$Tile_Collision.position.z = chunk_position.y-0.5
+		
+		$Settler_renderer.position.x = chunk_position.x-0.5
+		$Settler_renderer.position.z = chunk_position.y-0.5
+		
+		var a = 0
+		for i in range(chunk_size):
+				for j in range(chunk_size):
+					var state = map[i+chunk_position.x-(chunk_size/2)][j+chunk_position.y-(chunk_size/2)][map_layer.TILE_TYPE].type
+					$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(i+chunk_position.x-(chunk_size/2), 0, j+chunk_position.y-(chunk_size/2))))
+					match (state):
+						tile_type.PLAINS:
+							$Tile_render.multimesh.set_instance_color(a, PALE_GREEN)
+						tile_type.FOREST:
+							$Tile_render.multimesh.set_instance_color(a, GREEN)
+						tile_type.MOUNTAINS:
+							$Tile_render.multimesh.set_instance_color(a, GREY)
+						tile_type.DEEP_OCEAN:
+							$Tile_render.multimesh.set_instance_color(a, DARK_BLUE)
+						tile_type.DESERT:
+							$Tile_render.multimesh.set_instance_color(a, PALE_YELLOW)
+						tile_type.OCEAN:
+							$Tile_render.multimesh.set_instance_color(a, BLUE)
+						tile_type.TUNDRA:
+							$Tile_render.multimesh.set_instance_color(a, LIGHT_GREY)
+						tile_type.RIVER:
+							$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
+					a+=1
+	
+	render_units()
+	
+	prevCameraPosI = CameraPosI
+	prev_units = units
+
+func render_units() -> void:
+	units = get_units_in_box(chunk_position)
+	for x in range(units.size()):
+		match(units[x].type):
+			unit_type.settler:
+				$Settler_renderer.multimesh.instance_count = units.size()
+				var gc : Vector2i = units[x].global_coordinate
+				var lp : Vector2 = Vector2((units[x].global_coordinate.x+0.5)-(chunk_size/2),(units[x].global_coordinate.y+0.5)-(chunk_size/2))
+				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
+				if (get_unit_selected(gc)):
+					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
+				else:
+					$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
+
+func timer() -> void:
 	if time_stop:
 		hour+=1
 	if hour == 24:
@@ -380,65 +412,3 @@ func _process(_delta):
 				year += 1
 				month = 0
 				day = 1
-	
-	# render tiles and units
-	CameraPosI = Vector2i(int(Camera.position.x),int(Camera.position.z))
-	
-	var chunk_offset : Vector2i
-	if ((Camera.position.x <= (chunk_size/2))):
-		chunk_offset.x = (chunk_size/2) - Camera.position.x
-	if ((Camera.position.z <= (chunk_size/2))):
-		chunk_offset.y = (chunk_size/2) - Camera.position.z
-		
-	var chunk_position : Vector2i
-	chunk_position.x = CameraPosI.x+chunk_offset.x
-	chunk_position.y = CameraPosI.y+chunk_offset.y
-	
-	if CameraPosI != null && prevCameraPosI != CameraPosI:
-		
-		$Tile_Collision.position.x = chunk_position.x-0.5
-		$Tile_Collision.position.z = chunk_position.y-0.5
-		
-		$Settler_renderer.position.x = chunk_position.x-0.5
-		$Settler_renderer.position.z = chunk_position.y-0.5
-		
-		var a = 0
-		for i in range(chunk_size):
-				for j in range(chunk_size):
-					var state = map[i+chunk_position.x-(chunk_size/2)][j+chunk_position.y-(chunk_size/2)][map_layer.TILE_TYPE].type
-					$Tile_render.multimesh.set_instance_transform(a, Transform3D(Basis(), Vector3(i+chunk_position.x-(chunk_size/2), 0, j+chunk_position.y-(chunk_size/2))))
-					match (state):
-						tile_type.PLAINS:
-							$Tile_render.multimesh.set_instance_color(a, PALE_GREEN)
-						tile_type.FOREST:
-							$Tile_render.multimesh.set_instance_color(a, GREEN)
-						tile_type.MOUNTAINS:
-							$Tile_render.multimesh.set_instance_color(a, GREY)
-						tile_type.DEEP_OCEAN:
-							$Tile_render.multimesh.set_instance_color(a, DARK_BLUE)
-						tile_type.DESERT:
-							$Tile_render.multimesh.set_instance_color(a, PALE_YELLOW)
-						tile_type.OCEAN:
-							$Tile_render.multimesh.set_instance_color(a, BLUE)
-						tile_type.TUNDRA:
-							$Tile_render.multimesh.set_instance_color(a, LIGHT_GREY)
-						tile_type.RIVER:
-							$Tile_render.multimesh.set_instance_color(a, BABY_BLUE)
-					a+=1
-	
-	
-	units = get_units_in_box($Camera.position)
-	for x in range(units.size()):
-		match(units[x].type):
-			unit_type.settler:
-				$Settler_renderer.multimesh.instance_count = units.size()
-				var gc : Vector2i = units[x].global_coordinate
-				var lp : Vector2i = Vector2i(int((units[x].global_coordinate.x-CameraPosI.x)-(chunk_size/2)),int((units[x].global_coordinate.y-CameraPosI.y)-(chunk_size/2)))
-				$Settler_renderer.multimesh.set_instance_transform(x, Transform3D(Basis(), Vector3(lp.x, 0.0625, lp.y)))
-				if (get_unit_selected(gc)):
-					$Settler_renderer.multimesh.set_instance_color(x, "#fcba03")
-				else:
-					$Settler_renderer.multimesh.set_instance_color(x, "#FFFFFF")
-	
-	prevCameraPosI = CameraPosI
-	prev_units = units

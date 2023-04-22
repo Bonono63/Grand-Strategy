@@ -1,11 +1,11 @@
 extends Node3D
 
 const zoom_increment = 0.5
-const max_zoom = 9.5
+const max_zoom = 20
 const min_zoom = 1.5
 
 @export var zoom_speed = 0.09
-@export var mouse_sensitivity = 0.01
+@export var mouse_sensitivity = 0.005
 @export var main : Node3D
 
 var zoom = min_zoom
